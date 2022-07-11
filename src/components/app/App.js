@@ -14,8 +14,8 @@ const App = () => {
     // marvelData.getAllCharacters()
     //     .then(data => console.log(data))
 
-    // marvelData.getCharacter(1010915)
-    //     .then(data => console.log(data))
+    // // marvelData.getCharacter(1010915)
+    // //     .then(data => console.log(data))
 
 
     return (
