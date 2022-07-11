@@ -48,7 +48,7 @@ class MarvelService {
             id: dataChar.id,
             img: dataChar.thumbnail.path + "." + dataChar.thumbnail.extension,
             name: dataChar.name,
-            descr: dataChar.description ? `${dataChar.description.slice(0, 220)}...` : "В базе данных нету описания для этого персонажа",
+            descr: dataChar.description ? `${dataChar.description.slice(0, 220)}...` : "В базе данных не найденно описание для этого персонажа :(",
             homepage: dataChar.urls[0].url,
             wiki: dataChar.urls[1].url,
             comics:dataChar.comics.items

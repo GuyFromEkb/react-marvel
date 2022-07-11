@@ -91,14 +91,24 @@ class CharInfo extends Component {
         const imgStyleChek = img.slice(-17, -4) === 'not_available'
         const style = imgStyleChek ? { objectFit: 'revert' } : null
 
-        const renderComics = comics.map((item, index) => {
-            return (
-                <li key={index} className="char__comics-item">
-                    {item.name}
-                </li>
-            )
-        })
 
+        const renderComics = () => {
+
+            if (comics == false) {
+                return (
+                    <p>{'В базе данных не найденно комиксов по данному персонажу :('}</p>
+                )
+            }
+
+            return comics.map((item, index) => {
+
+                return (
+                    <li key={index} className="char__comics-item">
+                        {item.name}
+                    </li>
+                )
+            })
+        }
         return (
             <>
                 <div className="char__basics">
@@ -109,7 +119,7 @@ class CharInfo extends Component {
                             <a target={'_blank'} href={homepage} className="button button__main">
                                 <div className="inner">homepage</div>
                             </a>
-                            <a  target={'_blank'} href={wiki} className="button button__secondary">
+                            <a target={'_blank'} href={wiki} className="button button__secondary">
                                 <div className="inner">Wiki</div>
                             </a>
                         </div>
@@ -122,7 +132,7 @@ class CharInfo extends Component {
                 <div className="char__comics">Comics:</div>
                 <ul className="char__comics-list">
 
-                    {renderComics}
+                    {renderComics()}
 
                 </ul>
             </>
