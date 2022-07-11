@@ -4,6 +4,7 @@ const Spinner = () => {
     const style = {
         margin: '0 auto',
         background: 'none',
+        display: 'block'
     }
 
     return (

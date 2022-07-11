@@ -19,10 +19,11 @@ class CharList extends Component {
     componentDidMount() {
 
         this.onUpdateList()
-
+        console.log();
 
 
     }
+
 
     onUpdateList = () => {
 
@@ -40,7 +41,7 @@ class CharList extends Component {
                     loading: false,
                     error: false,
                 })
-                console.log(this.state);
+                // console.log(this.state);
             })
             .catch((e) => {
                 console.log(e)
@@ -59,7 +60,7 @@ class CharList extends Component {
             const style = imgStyleChek ? { objectFit: 'revert' } : null
 
             return (
-                <li key={id} className="char__item">
+                <li onClick={() => { this.props.onGetCharId(id) }} key={id} className="char__item">
                     <img style={style} src={img} alt="abyss" />
                     <div className="char__name">{name}</div>
                 </li>
@@ -82,7 +83,6 @@ class CharList extends Component {
             (
                 <div className="char__list">
                     <ul className="char__grid">
-
 
                         {showErr}
                         {showLoad}

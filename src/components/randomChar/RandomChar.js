@@ -121,14 +121,14 @@ class RandomChar extends Component {
                     </p>
                     <div className="randomchar__btns">
 
-                        <a
+                        <a target={'_blank'}
                             // onClick={this.showState}
                             href={homepage}
                             className="button button__main">
                             <div className="inner">homepage</div>
                         </a>
 
-                        <a href={wiki} className="button button__secondary">
+                        <a target={'_blank'} href={wiki} className="button button__secondary">
                             <div className="inner">Wiki</div>
                         </a>
                     </div>
