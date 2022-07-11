@@ -1,7 +1,9 @@
 class MarvelService {
     _apiBase = 'https://gateway.marvel.com:443/v1/public/';
+    _apiKey = 'apikey=6f1245da0072ed5b88c95e958620e33c';
     // _apiKey = 'apikey=6327bd2d0793a5aef6b1528c6249095a';
-    _apiKey = 'apikey=c5d6fc8b83116d92ed468ce36bac6c62';
+    // _apiKey = 'apikey=c5d6fc8b83116d92ed468ce36bac6c62';
+
 
 
     getResource = async (url) => {
@@ -16,9 +18,11 @@ class MarvelService {
     }
 
 
-    getAllCharacters = async () => {
+    getAllCharacters = async (offset = 0) => {
 
-        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=205&${this._apiKey}`);
+        offset = offset < 1500 ? offset  : 0;
+
+        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);
 
         return (
             res.data.results
@@ -35,11 +39,13 @@ class MarvelService {
         const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
 
         return this._transformCharacter(res.data.results[0])
+        // return res.data.results[0]
     }
 
 
     _transformCharacter = (dataChar) => {
         return {
+            id: dataChar.id,
             img: dataChar.thumbnail.path + "." + dataChar.thumbnail.extension,
             name: dataChar.name,
             descr: dataChar.description ? `${dataChar.description.slice(0, 220)}...` : "В базе данных нету описания для этого персонажа",

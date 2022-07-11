@@ -8,10 +8,13 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 class RandomChar extends Component {
 
-    constructor() {
-        super()
+    // constructor() {
+    //     super()
+    //     // this.updateChar();
+    //     // this.tst()
+    // }
+    componentDidMount() {
         this.updateChar();
-        // this.tst()
     }
 
     state = {
@@ -22,10 +25,6 @@ class RandomChar extends Component {
 
     marvelData = new MarvelService();
 
-    // tst = () => {
-    //     this.marvelData.getAllCharacters()
-    //         .then(data => console.log(data))
-    // }
 
     updateChar = () => {
 
@@ -35,6 +34,7 @@ class RandomChar extends Component {
 
         this.marvelData.getCharacter(id)
             .then(data => {
+                // console.log(data)
                 this.setState({
                     char: data,
                     loading: false
@@ -50,20 +50,26 @@ class RandomChar extends Component {
 
 
         // случайное число от min до (max+1)
-        function randomInteger(min, max) {
+        // function randomInteger(min, max) {
 
-            let rand = min + Math.random() * (max + 1 - min);
-            return Math.floor(rand);
-        }
+        //     let rand = min + Math.random() * (max + 1 - min);
+        //     return Math.floor(rand);
+        // }
     }
 
-    // showState = (e) => {
-    //     e.preventDefault()
-    //     console.log(this.state.char);
-    // }
+
+
+    onUpdateChar = () => {
+        this.setState({
+            loading: true,
+            error: false
+        })
+        this.updateChar()
+    }
 
 
     render() {
+
         const { loading, char, error } = this.state
         const showErr = error ? <ErrorMessage /> : null
         const showLoad = loading ? <Spinner /> : null
@@ -87,7 +93,7 @@ class RandomChar extends Component {
                     <p className="randomchar__title">
                         Or choose another one
                     </p>
-                    <button className="button button__main">
+                    <button onClick={this.onUpdateChar} className="button button__main">
                         <div className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
@@ -101,9 +107,13 @@ class RandomChar extends Component {
 
         const { img, name, descr, homepage, wiki } = objInfo
 
+        const imgStyleChek = img.slice(-17, -4) === 'not_available'
+        const style = imgStyleChek ? { objectFit: 'revert' } : null
+
+        // console.log(imgStyleChek);
         return (
             <div className="randomchar__block">
-                <img src={img} alt={name} className="randomchar__img" />
+                <img src={img} alt={name} style={style} className={`randomchar__img ${1}`} />
                 <div className="randomchar__info">
                     <p className="randomchar__name">{name}</p>
                     <p className="randomchar__descr">
@@ -127,10 +137,24 @@ class RandomChar extends Component {
         )
     }
 
+    // showState = (e) => {
+    //     e.preventDefault()
+    //     console.log(this.state.char);
+    // }
+
+    // tst = () => {
+    //     this.marvelData.getAllCharacters()
+    //         .then(data => console.log(data))
+    // }
+
 }
 
 
+export function randomInteger(min, max) {
 
+    let rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
+}
 
 
 export default RandomChar;

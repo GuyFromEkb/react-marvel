@@ -17,7 +17,7 @@ const ErrorMessage = () => {
 
     return (
 
-        <div style={styleWrap} className="error__wrap">
+        <div  style={styleWrap} className="error__wrap">
             <img src={img} style={styleImg} alt="error-animate" />
         </div>
 
