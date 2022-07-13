@@ -42,7 +42,7 @@ class CharInfo extends Component {
 
         this.marvelData.getCharacter(charId)
             .then(data => {
-                console.log("zawel");
+                // console.log("zawel");
                 this.setState({
                     char: data,
                     loading: false

@@ -1,13 +1,14 @@
-import './charList.scss';
-// import abyss from '../../resources/img/abyss.jpg';
-import { Component } from 'react/cjs/react.production.min';
+import React, { Component } from 'react';
+
+import { randomInteger } from '../randomChar/RandomChar';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import { randomInteger } from '../randomChar/RandomChar';
+import './charList.scss';
 
 class CharList extends Component {
 
+    // refChar = React.createRef();
     state = {
         charList: [],
         loading: true,
@@ -20,7 +21,7 @@ class CharList extends Component {
     componentDidMount() {
 
         this.onUpdateList()
-        // console.log();
+        // console.log(refChar);
     }
 
     onLoadingMoreChar = () => {
@@ -57,7 +58,6 @@ class CharList extends Component {
                     loading: false,
                     error: false,
                 })
-                // console.log(this.state);
             })
             .catch((e) => {
                 console.log(e)
@@ -68,15 +68,46 @@ class CharList extends Component {
             })
     }
 
+    itemRefs = [];
+
+    setRef = (ref) => {
+        this.itemRefs.push(ref);
+    }
+
+    focusOnItem = (id) => {
+        // Я реализовал вариант чуть сложнее, и с классом и с фокусом
+        // Но в теории можно оставить только фокус, и его в стилях использовать вместо класса
+        // На самом деле, решение с css-классом можно сделать, вынеся персонажа
+        // в отдельный компонент. Но кода будет больше, появится новое состояние
+        // и не факт, что мы выиграем по оптимизации за счет бОльшего кол-ва элементов
+
+        // По возможности, не злоупотребляйте рефами, только в крайних случаях
+        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
+        this.itemRefs[id].classList.add('char__item_selected');
+        // this.itemRefs[id].focus();
+    }
+
+
     renderItems(arrChar) {
 
-        const items = arrChar.map(item => {
+        const items = arrChar.map((item, i) => {
             const { id, img, name } = item
             const imgStyleChek = img.slice(-17, -4) === 'not_available'
             const style = imgStyleChek ? { objectFit: 'revert' } : null
 
             return (
-                <li onClick={() => { this.props.onGetCharId(id) }} key={id} className="char__item">
+
+                <li
+                    className="char__item"
+                    tabIndex={0}
+                    ref={this.setRef}
+                    key={id}
+                    onClick={() => {
+                        this.props.onGetCharId(id)
+                        this.focusOnItem(i);
+                        console.log(this.itemRefs);
+                    }}
+                >
                     <img style={style} src={img} alt="abyss" />
                     <div className="char__name">{name}</div>
                 </li>
