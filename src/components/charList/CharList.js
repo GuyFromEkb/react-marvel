@@ -1,80 +1,58 @@
-import React, { Component } from 'react';
+import {useState, useEffect, useRef} from 'react';
+import PropTypes from 'prop-types';
 
-import { randomInteger } from '../randomChar/RandomChar';
-import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import MarvelService from '../../services/MarvelService';
 import './charList.scss';
 
-class CharList extends Component {
+const CharList = (props) => {
 
-    // refChar = React.createRef();
-    state = {
-        charList: [],
-        loading: true,
-        error: false,
-        offset: randomInteger(0, 1498),
-        loadingMoreChar: false
-    }
-    marvelData = new MarvelService()
+    const [charList, setCharList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [newItemLoading, setNewItemLoading] = useState(false);
+    const [offset, setOffset] = useState(210);
+    const [charEnded, setCharEnded] = useState(false);
+    
+    const marvelService = new MarvelService();
 
-    componentDidMount() {
+    useEffect(() => {
+        onRequest();
+    }, [])
 
-        this.onUpdateList()
-        // console.log(refChar);
-    }
-
-    onLoadingMoreChar = () => {
-
-        this.setState({
-            loadingMoreChar: true,
-            offset: randomInteger(0, 1498)
-        })
-
-        this.marvelData.getAllCharacters(this.state.offset)
-            .then(data => {
-                this.setState(({ charList }) => ({
-                    charList: [...charList, ...data],
-                    loadingMoreChar: false
-                }))
-                // console.log(this.state);
-            })
-
-
+    const onRequest = (offset) => {
+        onCharListLoading();
+        marvelService.getAllCharacters(offset)
+            .then(onCharListLoaded)
+            .catch(onError)
     }
 
-
-    onUpdateList = () => {
-
-        this.setState({
-            loading: true,
-            offset: randomInteger(0, 1498)
-        })
-
-        this.marvelData.getAllCharacters(this.state.offset)
-            .then(data => {
-                this.setState({
-                    charList: data,
-                    loading: false,
-                    error: false,
-                })
-            })
-            .catch((e) => {
-                console.log(e)
-                this.setState({
-                    error: true,
-                    loading: false
-                })
-            })
+    const onCharListLoading = () => {
+        setNewItemLoading(true);
     }
 
-    itemRefs = [];
+    const onCharListLoaded = (newCharList) => {
+        let ended = false;
+        if (newCharList.length < 9) {
+            ended = true;
+        }
 
-    setRef = (ref) => {
-        this.itemRefs.push(ref);
+        setCharList(charList => [...charList, ...newCharList]);
+        setLoading(loading => false);
+        setNewItemLoading(newItemLoading => false);
+        setOffset(offset => offset + 9);
+        setCharEnded(charEnded => ended);
     }
 
-    focusOnItem = (id) => {
+    const onError = () => {
+        setError(true);
+        setLoading(loading => false);
+    }
+
+    const itemRefs = useRef([]);
+
+    const focusOnItem = (id) => {
         // Я реализовал вариант чуть сложнее, и с классом и с фокусом
         // Но в теории можно оставить только фокус, и его в стилях использовать вместо класса
         // На самом деле, решение с css-классом можно сделать, вынеся персонажа
@@ -82,72 +60,73 @@ class CharList extends Component {
         // и не факт, что мы выиграем по оптимизации за счет бОльшего кол-ва элементов
 
         // По возможности, не злоупотребляйте рефами, только в крайних случаях
-        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
-        this.itemRefs[id].classList.add('char__item_selected');
-        // this.itemRefs[id].focus();
+        itemRefs.current.forEach(item => item.classList.remove('char__item_selected'));
+        itemRefs.current[id].classList.add('char__item_selected');
+        itemRefs.current[id].focus();
     }
 
-
-    renderItems(arrChar) {
-
-        const items = arrChar.map((item, i) => {
-            const { id, img, name } = item
-            const imgStyleChek = img.slice(-17, -4) === 'not_available'
-            const style = imgStyleChek ? { objectFit: 'revert' } : null
-
+    // Этот метод создан для оптимизации, 
+    // чтобы не помещать такую конструкцию в метод render
+    function renderItems(arr) {
+        const items =  arr.map((item, i) => {
+            let imgStyle = {'objectFit' : 'cover'};
+            if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
+                imgStyle = {'objectFit' : 'unset'};
+            }
+            
             return (
-
-                <li
+                <li 
                     className="char__item"
                     tabIndex={0}
-                    ref={this.setRef}
-                    key={id}
+                    ref={el => itemRefs.current[i] = el}
+                    key={item.id}
                     onClick={() => {
-                        this.props.onGetCharId(id)
-                        this.focusOnItem(i);
-                        console.log(this.itemRefs);
+                        props.onCharSelected(item.id);
+                        focusOnItem(i);
                     }}
-                >
-                    <img style={style} src={img} alt="abyss" />
-                    <div className="char__name">{name}</div>
+                    onKeyPress={(e) => {
+                        if (e.key === ' ' || e.key === "Enter") {
+                            props.onCharSelected(item.id);
+                            focusOnItem(i);
+                        }
+                    }}>
+                        <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
+                        <div className="char__name">{item.name}</div>
                 </li>
             )
-
-        })
-
-        return items
-    }
-
-
-    render() {
-        const { charList, loading, error, loadingMoreChar } = this.state
-
-        const showErr = error ? <ErrorMessage /> : null
-        const showLoad = loading ? <Spinner /> : null
-        const showContent = !(error || loading) ? this.renderItems(charList) : null
-
+        });
+        // А эта конструкция вынесена для центровки спиннера/ошибки
         return (
-            (
-                <div className="char__list">
-                    <ul className="char__grid">
-
-                        {showErr}
-                        {showLoad}
-                        {showContent}
-
-                    </ul>
-                    <button
-                        disabled={loadingMoreChar}
-                        onClick={this.onLoadingMoreChar}
-                        className="button button__main button__long"
-                    >
-                        <div className="inner">load more</div>
-                    </button>
-                </div>
-            )
+            <ul className="char__grid">
+                {items}
+            </ul>
         )
     }
+    
+    const items = renderItems(charList);
 
+    const errorMessage = error ? <ErrorMessage/> : null;
+    const spinner = loading ? <Spinner/> : null;
+    const content = !(loading || error) ? items : null;
+
+    return (
+        <div className="char__list">
+            {errorMessage}
+            {spinner}
+            {content}
+            <button 
+                className="button button__main button__long"
+                disabled={newItemLoading}
+                style={{'display': charEnded ? 'none' : 'block'}}
+                onClick={() => onRequest(offset)}>
+                <div className="inner">load more</div>
+            </button>
+        </div>
+    )
+}
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;

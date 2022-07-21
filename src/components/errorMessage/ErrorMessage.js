@@ -1,20 +1,9 @@
-import img from './error.gif'
+import img from './error.gif';
 
 const ErrorMessage = () => {
-
-    const styleImg = {
-        margin: `0 auto`,
-        objectFit: 'cover',
-        display: 'block',
-        // maxHeight: '200px'
-    }
-
     return (
-
-        <img src={img} style={styleImg} className="error" alt="error-animate" />
-
-
+        <img style={{ display: 'block', width: "250px", height: "250px",objectFit: 'contain', margin: "0 auto"}}  src={img} alt="Error"/>
     )
-
 }
-export default ErrorMessage
+
+export default ErrorMessage;
