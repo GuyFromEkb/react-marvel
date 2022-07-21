@@ -1,6 +1,6 @@
 [Figma](https://www.figma.com/file/ChwZS8we61vPEna1laLo7v/Marvel-DB)  
 
-[URL](https://marveldevekb.herokuapp.com/)  - Демо, неготовой версии (реализовано ~ 37%... готов только 1 экран)  
+[URL](https://react-marvel-three.vercel.app/)  - Демо, неготовой версии (реализовано ~ 37%... готов только 1 экран)  
 Приложение находится на стороннем ресурсе, без pro аккаунта ( 1ая загрузка может быть дольше обычной...)
 
 В работе...
